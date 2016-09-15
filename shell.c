@@ -5,39 +5,63 @@
 #include <string.h>
 #include <ctype.h>
 #include <sys/types.h>
+#include <string.h>
 
 int split(char *str, char **par)
 {
 	char ch[1024];
-	int i;
-	i=0;
 
 	while(*str!=NULL)
 	{
-		*par++=str;
+		
 		printf("%s\n","in loop" );
 		while((*str!=' ') && (*str!='\t') && (*str!=NULL))
-			//ch[i++]=*str++;
 			str++;
 		printf("%s\n","out while");
 		
 		while((*str==' ') || (*str=='\t'))
 		{
 			*str++=NULL;
-			//*str=NULL;
-			// ch[i]='\0';
-			// if(*str!=NULL)
-			// 	str++;
-			// strcpy(*par,ch);
-			// par++;
-			// i=0;
+
 		}
-		
+		*par++=str;
 
 
 	}
 	*par=NULL;
 	printf("%s\n","out of loop" );
+	return 0;
+}
+
+int getpath(char *str, char *path)
+{
+	char *ch;
+	int l;
+
+	printf("%s\n","in getpath" );
+	*(path+strlen(path)) = '\\';
+	*path++;
+	*path=NULL;
+
+	printf("%s\n",path );
+
+	// while(str!=NULL)
+	// {
+	// 	*path++=*str++;
+	// 	l++;
+	// }
+
+	//l=strlen(str);
+	ch=str+l;
+
+	// while(*ch!='\\')
+	// {
+	// 	ch--;
+	// }
+	// ch++;
+	// str=ch;
+	// *ch=NULL;
+
 	return 0;
 }
 
@@ -49,24 +73,33 @@ int main(int argc, char const *argv[])
 	int pid;
 	int status;
 	int i;
-	/* code */
-	/*putchar('\n');
-	putchar('$');
-	c=getchar();
-	putchar(':');
-	putchar(c);
-	putchar('\n');	
-	putchar('\n');
-	*/
+	char path[1024];
+	
+	/*For continuos prompts*/
 	for(;;)
 	{
 		printf("$" );
 		gets(str);
 		printf("%s1\n",str );
 
+		split(str,par);
+		getcwd(path,sizeof(path));
+		printf("%s\n",path );
+		getpath(str,path);
+
+		
+
+
 		pid=fork();
 
 		printf("%d\n",pid);
+
+		for (i = 0; par[i]!=NULL; ++i)
+			{
+				printf("%s\n", par[i]);
+			}
+			printf("%s\n",str );
+
 
 		if(pid==0)
 		printf("%s\n","Heyyy" );
@@ -80,26 +113,20 @@ int main(int argc, char const *argv[])
 		if (pid==0)
 		{
 			printf("CHILD\n");
-			split(str,par);
-			//printf("%s\n CHILD2\n",*par);
-			//printf("%s\n %s\n",par[1],par[2]);
-			for (i = 0; par[i]!=NULL; ++i)
-			{
-				/* code */
-				printf("%s\n", par[i]);
-			}
+			
+			//execl(path,str,par);
+
 			
 			
 		}
 
 		else if(pid>0)
 		{
-			while(wait(&status)!=pid)
-			printf("Hello!!\n");
+			while(waitpid(pid))
+			{}
 		}
 	
 
 	}
-	/*write(1,'&',sizeof(char));*/
 	return 0;
 }
