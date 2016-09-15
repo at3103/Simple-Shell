@@ -14,17 +14,30 @@ int split(char *str, char **par)
 
 	while(*str!=NULL)
 	{
-		while(*str!=' ' ||*str!='\t'||*str!=NULL )
-			ch[i++]=*(str++);
-		if(*str==' ' || *str=='\t')
+		*par++=str;
+		printf("%s\n","in loop" );
+		while((*str!=' ') && (*str!='\t') && (*str!=NULL))
+			//ch[i++]=*str++;
+			str++;
+		printf("%s\n","out while");
+		
+		while((*str==' ') || (*str=='\t'))
 		{
 			*str++=NULL;
-			ch[i++]=*(str++);
-			strcpy(*par++,ch);
-			i=0;
+			//*str=NULL;
+			// ch[i]='\0';
+			// if(*str!=NULL)
+			// 	str++;
+			// strcpy(*par,ch);
+			// par++;
+			// i=0;
 		}
+		
+
 
 	}
+	*par=NULL;
+	printf("%s\n","out of loop" );
 	return 0;
 }
 
@@ -35,6 +48,7 @@ int main(int argc, char const *argv[])
 	char *par[64];
 	int pid;
 	int status;
+	int i;
 	/* code */
 	/*putchar('\n');
 	putchar('$');
@@ -67,7 +81,14 @@ int main(int argc, char const *argv[])
 		{
 			printf("CHILD\n");
 			split(str,par);
-			printf("%s\n CHILD2",par);
+			//printf("%s\n CHILD2\n",*par);
+			//printf("%s\n %s\n",par[1],par[2]);
+			for (i = 0; par[i]!=NULL; ++i)
+			{
+				/* code */
+				printf("%s\n", par[i]);
+			}
+			
 			
 		}
 
