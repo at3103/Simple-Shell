@@ -20,4 +20,7 @@ w4118_sh:$(src) $(obj) $(deps)
 clean:
 	rm -f $(odir)/*.o w4118_sh *~
 
+test:test.c
+	gcc -o $@ $^ -I.
+
 

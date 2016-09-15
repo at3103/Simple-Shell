@@ -7,9 +7,11 @@
 #include <sys/types.h>
 #include <string.h>
 
-int split(char *str, char **par)
+int split(char *str, char **temp)
 {
 	char ch[1024];
+	int i;
+	char **par=temp;
 
 	while(*str!=NULL)
 	{
@@ -29,6 +31,13 @@ int split(char *str, char **par)
 
 	}
 	*par=NULL;
+
+	for (i = 0; temp[i]!=NULL; ++i)
+			{
+				printf("%s\n", temp[i]);
+			}
+
+
 	printf("%s\n","out of loop" );
 	return 0;
 }
@@ -36,32 +45,47 @@ int split(char *str, char **par)
 int getpath(char *str, char *path)
 {
 	char *ch;
+	char *pth;
+	char *comm;
 	int l;
+	pth=path+strlen(path);
 
 	printf("%s\n","in getpath" );
-	*(path+strlen(path)) = '\\';
-	*path++;
-	*path=NULL;
+	
+	*(pth++) = '/';
+	ch=str;
+	//pth++=str;
+	while(*ch!=NULL)
+	{
+		*(pth++)=*(ch++);
+	}
 
-	printf("%s\n",path );
+	*(pth)=NULL;
 
-	// while(str!=NULL)
-	// {
-	// 	*path++=*str++;
-	// 	l++;
-	// }
+	printf("%s\n",path);
 
-	//l=strlen(str);
+/*	while(str!=NULL)
+	{
+		*path++=*str++;
+		l++;
+	}*/
+
+	l=strlen(str);
 	ch=str+l;
 
-	// while(*ch!='\\')
-	// {
-	// 	ch--;
-	// }
-	// ch++;
-	// str=ch;
-	// *ch=NULL;
+	while(*(ch-1)!='/'&& ch!=str)
+	{
+		ch--;
+	}
+	//ch++;
+	if((*ch)=='/')
+		comm=ch+1;
+	else
+		comm=ch;
+	*(comm+strlen(comm)+1)=NULL;
 
+	printf("Command is %s\n",comm );
+	strcpy(str,comm);
 	return 0;
 }
 
@@ -74,6 +98,7 @@ int main(int argc, char const *argv[])
 	int status;
 	int i;
 	char path[1024];
+	char temp[1024];
 	
 	/*For continuos prompts*/
 	for(;;)
@@ -81,11 +106,13 @@ int main(int argc, char const *argv[])
 		printf("$" );
 		gets(str);
 		printf("%s1\n",str );
-
+		
 		split(str,par);
+		strcpy(temp,str);
 		getcwd(path,sizeof(path));
 		printf("%s\n",path );
-		getpath(str,path);
+		getpath(temp,path);
+		printf("Command in main is %s\n",temp );
 
 		
 
@@ -94,12 +121,7 @@ int main(int argc, char const *argv[])
 
 		printf("%d\n",pid);
 
-		for (i = 0; par[i]!=NULL; ++i)
-			{
-				printf("%s\n", par[i]);
-			}
-			printf("%s\n",str );
-
+		
 
 		if(pid==0)
 		printf("%s\n","Heyyy" );
@@ -114,16 +136,28 @@ int main(int argc, char const *argv[])
 		{
 			printf("CHILD\n");
 			
-			//execl(path,str,par);
-
+			printf("The path is%s\n",path );
+			printf("The command is %s\n",temp );
 			
+			printf("The arguments are %s\n",par[1]);
+
+			for (i = 0; par[i]!=NULL; ++i)
+			{
+				printf("%s\n", par[i]);
+			}
+			
+
+			execl(path,temp,par,0);
+
+
 			
 		}
 
 		else if(pid>0)
 		{
-			while(waitpid(pid))
-			{}
+			wait();
+			/*while(waitpid(pid))
+			{}*/
 		}
 	
 
