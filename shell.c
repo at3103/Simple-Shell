@@ -98,6 +98,7 @@ int main(int argc, char const *argv[])
 	int status;
 	int i;
 	char path[1024];
+	char cwd[1024];
 	char temp[1024];
 	
 	/*For continuos prompts*/
@@ -139,15 +140,25 @@ int main(int argc, char const *argv[])
 			printf("The path is%s\n",path );
 			printf("The command is %s\n",temp );
 			
-			printf("The arguments are %s\n",par[1]);
+			printf("The arguments are \n");
 
 			for (i = 0; par[i]!=NULL; ++i)
 			{
 				printf("%s\n", par[i]);
 			}
 			
+			if(strcmp(temp,"cd")==0)
+			{
+				chdir(par[0]);
+				getcwd(cwd,sizeof(cwd));
+				printf("The changed dir is %s\n",cwd);	
+			}
 
-			execl(path,temp,par,0);
+			else
+			{
+				execl(path,temp,par,0);
+			}
+			
 
 
 			
