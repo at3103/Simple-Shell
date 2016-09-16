@@ -66,7 +66,12 @@ int split1(char *strtemp, char *temp)
 
 	}
 	//temp=str;
-	strcpy(temp,str);
+	if(str=='\0')
+	{
+		strcpy(temp," ");
+	}
+	else
+		strcpy(temp,str);
 	//if(*(str+1)!='\0')
 	
 
@@ -249,9 +254,13 @@ int main(int argc, char const *argv[])
 					printf("First argument is %s ", par[i]);
 				}*/
 				//printf("\n");
-				execl(str,temp,par1,0);
-				//execl("/bin/ls","ls","-l",0);
-				//execvp(temp,par);
+				//execl("/bin/ls","ls",".",0);
+				if(strcmp(par1,"\0")==0)
+				{
+					execl(str,temp,0);
+				}
+				else
+					execl(str,temp,par1,0);
 				return 0;
 				
 
