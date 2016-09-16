@@ -18,7 +18,7 @@ w4118_sh:$(src) $(obj) $(deps)
 	$(cc) -o $@ $^ $(cflags)
 
 clean:
-	rm -f $(odir)/*.o w4118_sh *~
+	rm -f $(odir)/*.o w4118_sh *.o test *~
 
 test:test.c
 	gcc -o $@ $^ -I.

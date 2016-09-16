@@ -6,6 +6,7 @@
 #include <ctype.h>
 #include <sys/types.h>
 #include <string.h>
+//#include <process.h>
 
 int split(char *str, char **temp)
 {
@@ -13,32 +14,32 @@ int split(char *str, char **temp)
 	int i;
 	char **par=temp;
 
-	while(*str!=NULL)
+	while(*str!='\0')
 	{
 		
-		printf("%s\n","in loop" );
-		while((*str!=' ') && (*str!='\t') && (*str!=NULL))
+		printf("%s\n","in loop" );/*debug*/
+		while((*str!=' ') && (*str!='\t') && (*str!='\0'))
 			str++;
-		printf("%s\n","out while");
+		printf("%s\n","out while");/*debug*/
 		
 		while((*str==' ') || (*str=='\t'))
 		{
-			*str++=NULL;
+			*str++='\0';
 
 		}
 		*par++=str;
 
 
 	}
-	*par=NULL;
+	*par='\0';
 
-	for (i = 0; temp[i]!=NULL; ++i)
+	for (i = 0; temp[i]!='\0'; ++i)
 			{
 				printf("%s\n", temp[i]);
 			}
 
 
-	printf("%s\n","out of loop" );
+	printf("%s\n","out of loop" );/*debug*/
 	return 0;
 }
 
@@ -47,13 +48,15 @@ int getpath(char *str, char *path)
 	char *ch;
 	char *pth;
 	char *comm;
-	int l;
-	pth=path+strlen(path);
+	size_t l;
 
-	printf("%s\n","in getpath" );
+	pth=path;
+	/*pth=path+strlen(path);
+*/
+	printf("%s\n","in getpath" );/*debug*/
 	
-	*(pth++) = '/';
-	ch=str;
+	/**(pth++) = '/';*/
+	/*ch=str;
 	//pth++=str;
 	while(*ch!=NULL)
 	{
@@ -63,7 +66,7 @@ int getpath(char *str, char *path)
 	*(pth)=NULL;
 
 	printf("%s\n",path);
-
+*/
 /*	while(str!=NULL)
 	{
 		*path++=*str++;
@@ -79,12 +82,30 @@ int getpath(char *str, char *path)
 	}
 	//ch++;
 	if((*ch)=='/')
+	{
 		comm=ch+1;
-	else
+		*pth++='/';
+		*pth='\0';
+	}
+	else if((ch==str) && *ch!='/')
+	{
 		comm=ch;
-	*(comm+strlen(comm)+1)=NULL;
+		*pth++='.';
+		*pth='\0';
 
-	printf("Command is %s\n",comm );
+	}
+	else
+	{
+		comm=ch;
+		*(ch-1)='\0';
+		strcpy(pth,str);
+		pth++;
+		*pth='\0';
+	}
+	*(comm+strlen(comm)+1)='\0';
+
+	printf("Command is %s\n",comm );/*debug*/
+	printf("Path is %s\n",path );/*debug*/
 	strcpy(str,comm);
 	return 0;
 }
@@ -100,77 +121,105 @@ int main(int argc, char const *argv[])
 	char path[1024];
 	char cwd[1024];
 	char temp[1024];
-	
+	int flag;
+	size_t str_len;
 	/*For continuos prompts*/
 	for(;;)
-	{
+	{	
+		flag=0;
+		*path=' ';
 		printf("$" );
-		gets(str);
-		printf("%s1\n",str );
+		/*gets(str);*/
+		fgets(str,sizeof(str),stdin);
+
+		str_len=strlen(str);
+
+		if(str_len>0 && str[str_len-1]=='\n')
+		{
+			str[str_len-1]='\0';
+		}
+
+		printf("%s1\n",str );	/*debug*/
 		
 		split(str,par);
 		strcpy(temp,str);
-		getcwd(path,sizeof(path));
-		printf("%s\n",path );
+		//getcwd(path,sizeof(path));
 		getpath(temp,path);
-		printf("Command in main is %s\n",temp );
+		printf("Command in main is %s\n",temp );/*debug*/
+
 
 		
-
-
-		pid=fork();
-
-		printf("%d\n",pid);
-
-		
-
-		if(pid==0)
-		printf("%s\n","Heyyy" );
-
-		if (pid<0)
+		if(strcmp(temp,"exit")==0)
 		{
-			perror("fork");
-			exit(1);
+			printf("Exiting %s\n",temp);/*debug*/
+			flag=1;	
+			exit(0);
+			//break;
 		}
 
-		if (pid==0)
-		{
-			printf("CHILD\n");
-			
-			printf("The path is%s\n",path );
-			printf("The command is %s\n",temp );
-			
-			printf("The arguments are \n");
-
-			for (i = 0; par[i]!=NULL; ++i)
-			{
-				printf("%s\n", par[i]);
-			}
-			
-			if(strcmp(temp,"cd")==0)
-			{
-				chdir(par[0]);
-				getcwd(cwd,sizeof(cwd));
-				printf("The changed dir is %s\n",cwd);	
-			}
-
-			else
-			{
-				execl(path,temp,par,0);
-			}
-			
-
-
-			
+		else if(strcmp(temp,"cd")==0)
+		{	
+			flag=1;
+			chdir(par[0]);
+			getcwd(cwd,sizeof(cwd));
+			printf("The changed dir is %s\n",cwd);/*debug*/	
 		}
 
-		else if(pid>0)
+			
+
+		else if(strcmp(temp,"history")==0)
 		{
-			wait();
-			/*while(waitpid(pid))
-			{}*/
+			flag=1;
+			chdir(par[0]);
+			getcwd(cwd,sizeof(cwd));
+			printf("The changed dir is %s\n",cwd);/*debug*/	
 		}
-	
+
+		else
+		{
+			pid=fork();
+
+			printf("%d\n",pid);
+
+			
+			if (pid<0)
+			{
+				perror("fork");
+				exit(1);
+			}
+
+			if (pid==0)
+			{
+
+				printf("CHILD\n");/*debug*/
+			
+				printf("The path is %s\n",path );/*debug*/
+				printf("The command is %s\n",temp );/*debug*/
+				
+				printf("The arguments are \n");/*debug*/
+
+				for (i = 0; par[i]!=NULL; ++i)
+				{
+					printf("%s\n", par[i]);
+				}
+			
+				execl(str,temp,par,0);
+
+				return 0;
+				//execvp(temp,par);
+
+				
+			}
+
+			else 
+			{
+				while(wait(&status)!=pid)
+					;
+				//waitpid(pid);
+				/*while(!waitpid(pid))
+				{}*/
+			}
+		}
 
 	}
 	return 0;
