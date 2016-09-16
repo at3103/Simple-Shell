@@ -8,16 +8,18 @@
 #include <string.h>
 //#include <process.h>
 
-int split(char *str, char **temp)
+int split(char *strtemp, char **temp)
 {
 	char ch[1024];
 	int i;
 	char **par=temp;
+	char *str=strtemp;
 
 	while(*str!='\0')
 	{
 		
 		printf("%s\n","in loop" );/*debug*/
+		*par++=str;
 		while((*str!=' ') && (*str!='\t') && (*str!='\0'))
 			str++;
 		printf("%s\n","out while");/*debug*/
@@ -27,21 +29,60 @@ int split(char *str, char **temp)
 			*str++='\0';
 
 		}
-		*par++=str;
+		//if(*(str+1)!='\0')
+		
 
 
 	}
 	*par='\0';
 
 	for (i = 0; temp[i]!='\0'; ++i)
-			{
-				printf("%s\n", temp[i]);
-			}
+	{
+		printf("Arguments are %sthis\n", temp[i]);
+	}
 
 
 	printf("%s\n","out of loop" );/*debug*/
 	return 0;
 }
+
+int split1(char *strtemp, char *temp)
+{
+	char ch[1024];
+	int i;
+	char *par=temp;
+	char *str=strtemp;
+
+
+	printf("%s\n","in loop" );/*debug*/
+	
+	while((*str!=' ') && (*str!='\t') && (*str!='\0'))
+		str++;
+	printf("%s\n","out while");/*debug*/
+	
+	while((*str==' ') || (*str=='\t'))
+	{
+		*str++='\0';
+
+	}
+	//temp=str;
+	strcpy(temp,str);
+	//if(*(str+1)!='\0')
+	
+
+
+	
+	//*par='\0';
+
+	
+	printf("Arguments are %sthis\n", temp);
+	
+
+
+	printf("%s\n","out of loop" );/*debug*/
+	return 0;
+}
+
 
 int getpath(char *str, char *path)
 {
@@ -115,6 +156,7 @@ int main(int argc, char const *argv[])
 	char c;
 	char str[1024];
 	char *par[64];
+	char par1[1024];
 	int pid;
 	int status;
 	int i;
@@ -141,11 +183,14 @@ int main(int argc, char const *argv[])
 
 		printf("%s1\n",str );	/*debug*/
 		
-		split(str,par);
+		//split(str,par);
+		split1(str,par1);
 		strcpy(temp,str);
 		//getcwd(path,sizeof(path));
 		getpath(temp,path);
 		printf("Command in main is %s\n",temp );/*debug*/
+		printf("Parameters in main is %s\n",par1 );/*debug*/
+
 
 
 		
@@ -160,7 +205,8 @@ int main(int argc, char const *argv[])
 		else if(strcmp(temp,"cd")==0)
 		{	
 			flag=1;
-			chdir(par[0]);
+			//chdir(par[0]);
+			chdir(par1);
 			getcwd(cwd,sizeof(cwd));
 			printf("The changed dir is %s\n",cwd);/*debug*/	
 		}
@@ -170,7 +216,7 @@ int main(int argc, char const *argv[])
 		else if(strcmp(temp,"history")==0)
 		{
 			flag=1;
-			chdir(par[0]);
+			chdir(par1);
 			getcwd(cwd,sizeof(cwd));
 			printf("The changed dir is %s\n",cwd);/*debug*/	
 		}
@@ -193,20 +239,21 @@ int main(int argc, char const *argv[])
 
 				printf("CHILD\n");/*debug*/
 			
-				printf("The path is %s\n",path );/*debug*/
+				printf("The path is %s\n",str );/*debug*/
 				printf("The command is %s\n",temp );/*debug*/
 				
-				printf("The arguments are \n");/*debug*/
+				printf("The arguments are %s\n",par1);/*debug*/
 
-				for (i = 0; par[i]!=NULL; ++i)
+				/*for (i = 0; par[i]!=NULL; ++i)
 				{
-					printf("%s\n", par[i]);
-				}
-			
-				execl(str,temp,par,0);
-
-				return 0;
+					printf("First argument is %s ", par[i]);
+				}*/
+				//printf("\n");
+				execl(str,temp,par1,0);
+				//execl("/bin/ls","ls","-l",0);
 				//execvp(temp,par);
+				return 0;
+				
 
 				
 			}
