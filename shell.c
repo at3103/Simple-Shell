@@ -215,14 +215,24 @@ int main(int argc, char const *argv[])
 	char temp[1024];
 	int flag;
 	size_t str_len;
+	int j;
+	int hflag=0;
+
 	/*For continuos prompts*/
 	for(;;)
 	{	
 		flag=0;
 		*path=' ';
-		printf("$" );
-		/*gets(str);*/
-		fgets(str,sizeof(str),stdin);
+		if (hflag==0)
+		{
+			printf("$" );
+			/*gets(str);*/
+			fgets(str,sizeof(str),stdin);
+		}
+/*		else
+		{
+			hflag=0;
+		}*/
 
 		str_len=strlen(str);
 
@@ -237,8 +247,10 @@ int main(int argc, char const *argv[])
 		split1(str1,par1);
 
 		
-		if(strcmp(str1,"history")!=0)
+		if(strcmp(str1,"history")!=0 && hflag ==0)
 			insert_history(str);
+		else
+			hflag=0;
 		split(str,par);
 		//split1(str1,par1);
 		strcpy(temp,str1);
@@ -262,9 +274,24 @@ int main(int argc, char const *argv[])
 				clear_history();
 			}
 
-			else if (isdigit(par1[0]) || (isdigit(par1[0]) && isdigit(par1[1])))
+			else if (((atoi(par1) < 10 && par1[1]=='\0') || (atoi(par1) <100 && atoi(par1) >9 && isdigit(par1[1]))) && (atoi(par1)>=0 && isdigit(par1[0])))
 			{
-				printf("%s\n", "Offset detected." );
+			// {&& !isdigit(par1[0])) || (isdigit(par1[0]) && isdigit(par1[1]))
+				printf("%s %d\n", "Offset detected.", atoi(par1));
+				j=atoi(par1);
+				if(j<=hist_count)
+				{
+					strcpy(str,hist[j]);
+					hflag=1;
+					//write(0,str,sizeof(str));
+					continue;
+
+				}
+				else
+				{
+					printf("%s\n","error: Offset out of range" );
+				}
+				
 			}
 
 			else
@@ -290,7 +317,6 @@ int main(int argc, char const *argv[])
 
 		else if(strcmp(temp,"exit")==0)
 		{
-			//printf("Exiting %s\n",temp);/*debug*/
 			flag=1;	
 			exit(0);
 			//break;
@@ -300,9 +326,6 @@ int main(int argc, char const *argv[])
 		else
 		{
 			pid=fork();
-
-			//printf("%d\n",pid);/*debug*/
-
 			
 			if (pid<0)
 			{
@@ -350,9 +373,7 @@ int main(int argc, char const *argv[])
 			{
 				while(wait(&status)!=pid)
 					;
-				//waitpid(pid);
-				/*while(!waitpid(pid))
-				{}*/
+
 			}
 		}
 
