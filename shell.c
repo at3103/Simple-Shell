@@ -312,7 +312,11 @@ int main(int argc, char const *argv[])
 		{
 			if (pflag==0)
 			{
-				insert_history(str,str_size);
+				if (hflag==0)
+				{
+					insert_history(str,str_size);
+				}
+				
 				compute_pipe(str);
 				printf("%d\n",pipe_count );
 				pfd=(int*)malloc((pipe_count+1)*sizeof(int));
@@ -438,8 +442,8 @@ int main(int argc, char const *argv[])
 						for ( l = 0; l <= pipe_count; ++l)
 						{
 							printf("%s\n","Entered2" );
-							if(l==pipe_curr+1)
-								continue;
+							// if(l==pipe_curr+1 || l==pipe_curr-1)
+							// 	continue;
 							close(pfd[l]);
 						}
 					}
@@ -450,8 +454,8 @@ int main(int argc, char const *argv[])
 
 						for ( l = 0; l <= pipe_count; ++l)
 						{
-							if(l==pipe_curr+1)
-								continue;
+							// if(l==pipe_curr+1)
+							// 	continue;
 							close(pfd[l]);
 						}
 					}
@@ -461,8 +465,8 @@ int main(int argc, char const *argv[])
 						printf("%s\n","Entered4" );
 						for ( l = 0; l <= pipe_count; ++l)
 						{
-							if(l==pipe_curr+1)
-								continue;
+							// if(l==pipe_curr-1)
+							// 	continue;
 							close(pfd[l]);
 						}
 
