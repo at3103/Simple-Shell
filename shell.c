@@ -279,6 +279,8 @@ int main(int argc, char const *argv[])
 		free(hist[100]);
 		free(par1);
 		free(temp);
+		// free(strpipe[64]);
+		// free(pfd);
 	}
 
 	/*For continuos prompts*/
@@ -517,13 +519,18 @@ int main(int argc, char const *argv[])
 					
 				}*/
 				
-				while(wait(&status)!=pid)
-					;
-				if (pflag==1)
+				
+				if (pflag==1 && pipe_curr<pipe_count)
 				{
 					pipe_curr++;
 					printf("%s%d\n","INcremented",pipe_curr );
+					continue;
 
+				}
+				else if (pflag==1)
+				{
+					pipe_curr++;
+					printf("%s%d\n","INcremented",pipe_curr );
 				}
 				if(pflag==1 && pipe_curr==pipe_count+1)
 				{
@@ -537,14 +544,20 @@ int main(int argc, char const *argv[])
 					{
 						close(pfd[l]);
 					}
+					//mem_clear();
+					pipe_count=-1;
+					free(strpipe[64]);
+					free(pfd);
 
 				}
-				
+				while(wait(&status)!=pid)
+					;
+				//mem_clear();
 
 			}
 		}
 
-	//mem_clear();
+	
 	}
 
 	
