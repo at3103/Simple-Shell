@@ -9,13 +9,13 @@
 
 int main(int argc, char const *argv[])
 {
-	char c;
+	/*char c;
 	char str[1024];
 	char *par[64];
 	int pid;
 	int status;
 	int i;
-	char path[1024];
+	char path[1024];*/
 	
 	/*For continuos prompts*/
 	
