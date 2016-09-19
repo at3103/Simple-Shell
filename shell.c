@@ -283,13 +283,13 @@ int main(int argc, char const *argv[])
 				if (pipe_curr < pipe_count
 					&& pipe_curr != 0) {
 					//if (pipe_curr % 2 != 0)
-					dup2(pfd[(2 * 1) - 2], 0);
+					dup2(pfd[(2 * pipe_curr) - 2], 0);
 					//dup2(pfd[0],0);
 					//close(pfd[0]);
 					//dup2(pfd[3],1);
 					//close(pfd[3]);
 					//close_pipe(pfd);
-					dup2(pfd[(2 * 1) + 1], 1);
+					dup2(pfd[(2 * pipe_curr) + 1], 1);
 					//printf("%s\n",*stdin);
 					//printf("%s\n",*stdout);
 					//else
