@@ -25,13 +25,9 @@ int split(char *strtemp, char **temp)
 	char *str = strtemp;
 
 	while (*str != '\0') {
-
-		//printf("%s\n","in loop" );/*debug*/
 		*par++ = str;
 		while ((*str != ' ') && (*str != '\t') && (*str != '\0'))
 			str++;
-		//printf("%s\n","out while");/*debug*/
-
 		while ((*str == ' ') || (*str == '\t'))
 			*str++ = '\0';
 
@@ -95,7 +91,7 @@ int display_history(void)
 	int i;
 
 	if (hist_count ==  -1) {
-		printf("\n\n");
+//		printf("\n\n");
 		return 0;
 	}
 
@@ -126,13 +122,12 @@ int compute_pipe(char *str)
 	return 0;
 }
 
-int close_pipe(int *pfd,int i,int f)
+int close_pipe(int *pfd)
 {
-	int l=0;
+	int l = 0;
 
-	for (l = 0; l <= pipe_count; ++l) {
+	for (l = 0; l <= pipe_count; ++l)
 		close(pfd[l]);
-	}
 }
 
 int main(int argc, char const *argv[])
@@ -194,24 +189,16 @@ int main(int argc, char const *argv[])
 					insert_history(str, str_size);
 
 				compute_pipe(str);
-				printf("%d\n", pipe_count);
 				pfd = (int *)malloc((pipe_count)*2*sizeof(int));
 				pipe_curr = 0;
-				
-				for (i = 0; i < pipe_count; ++i)
-				{
-					if(pipe(pfd+(2*i))== -1){
+				for (i = 0; i < pipe_count; ++i) {
+					if (pipe(pfd + (2 * i)) == -1) {
 						perror("pipe");
 						exit(EXIT_FAILURE);
 					}
 				}
-				
 				pflag = 1;
 			}
-/*
-*			if (pipe_curr==pipe_count+1)
-*				pflag=0;
-*/
 
 			strcpy(str, strpipe[pipe_curr]);
 
@@ -221,7 +208,6 @@ int main(int argc, char const *argv[])
 		temp = (char *)malloc(str_len*sizeof(char));
 		path = (char *)malloc(str_len*sizeof(char));
 
-		//printf("%s\n","history insertd" ); /*debug*/
 		strcpy(str1, str);
 		split1(str1, par1);
 
@@ -232,12 +218,7 @@ int main(int argc, char const *argv[])
 			hflag = 0;
 
 		split(str, par);
-		//split1(str1,par1);
 		strcpy(temp, str1);
-
-
-		//printf("Command in main is %s\n",temp );/*debug*/
-		//printf("Parameters in main is %s\n",par1 );/*debug*/
 
 
 		if (strcmp(temp, "history") == 0 && pflag == 0) {
@@ -278,8 +259,6 @@ int main(int argc, char const *argv[])
 		/*exit command*/
 		else if (strcmp(temp, "exit") == 0) {
 			flag = 1;
-
-			//mem_clear();
 			exit(0);
 		}
 
@@ -296,44 +275,28 @@ int main(int argc, char const *argv[])
 			}
 
 			else if (pid == 0 && pflag == 1) {
-				printf("%s\n", "Entered");
 				if (pipe_curr < pipe_count
 					&& pipe_curr != 0) {
-					printf("%s\n", "Entered2");
 					dup2(pfd[pipe_curr-1], 0);
-					//read(pfd[pipe_curr-1]);
 					dup2(pfd[pipe_curr+1], 1);
-					close_pipe(pfd,pipe_curr,0);
+					close_pipe(pfd);
 
 
 				} else if (pipe_curr == 0) {
-					printf("%s\n", "Entered3");
 					dup2(pfd[pipe_curr+1], 1);
-					close_pipe(pfd,pipe_curr,1);
-
+					close_pipe(pfd);
 
 				} else {
 					dup2(pfd[pipe_curr-1], 0);
-					printf("%s\n", "Entered4");
-					close_pipe(pfd,pipe_curr,-1);
+					close_pipe(pfd);
 				}
-				// printf("The path is %s\n", str);/*debug*/
-				// printf("The command is %s\n", temp);/*debug*/
-
-				// printf("The arg are %s\n", par[1]);/*debug*/
-				if (execv(str, par) ==  -1) 
+				if (execv(str, par) ==  -1)
 					printf("error: %s\n", strerror(errno));
 				return 0;
 				}
 
-			else if (pid == 0 && pflag==0)
-			{
-				printf("The path is %s\n", str);/*debug*/
-				printf("The command is %s\n", temp);/*debug*/
-
-				printf("The arg are %s\n", par[1]);/*debug*/
-
-				if (execv(str, par) ==  -1) 
+			else if (pid == 0 && pflag == 0) {
+				if (execv(str, par) ==  -1)
 					printf("error: %s\n", strerror(errno));
 				return 0;
 			}
@@ -343,22 +306,17 @@ int main(int argc, char const *argv[])
 
 				if (pflag == 1 && pipe_curr < pipe_count) {
 					pipe_curr++;
-					//printf("%s%d\n", "Inc", pipe_curr);
 					continue;
 
 				} else if (pflag == 1 &&
 						pipe_curr == pipe_count) {
 					pipe_curr++;
-					printf("%s%d\n", "Inc", pipe_curr);
 				}
-				if (pflag == 1 
+				if (pflag == 1
 					&& pipe_curr == pipe_count+1) {
 					pflag = 0;
-					//dup2(0, 0);
-					//dup2(1, 1);
-					printf("%s\n", "Finished");
 					pipe_curr = 0;
-					close_pipe(pfd,-1,0);
+					close_pipe(pfd);
 					pipe_count =  -1;
 					free(strpipe[64]);
 					free(pfd);
