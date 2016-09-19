@@ -195,7 +195,7 @@ int main(int argc, char const *argv[])
 
 				compute_pipe(str);
 				printf("%d\n", pipe_count);
-				pfd = (int *)malloc((pipe_count+1)*sizeof(int));
+				pfd = (int *)malloc((pipe_count)*2*sizeof(int));
 				pipe_curr = 0;
 				
 				for (i = 0; i < pipe_count; ++i)
@@ -304,9 +304,7 @@ int main(int argc, char const *argv[])
 					//read(pfd[pipe_curr-1]);
 					dup2(pfd[pipe_curr+1], 1);
 					close_pipe(pfd,pipe_curr,0);
-					//close_pipe(pfd,pipe_curr,0);
-					// close(pfd[pipe_curr+1]);
-					// close(pfd[pipe_curr-1]);
+
 
 				} else if (pipe_curr == 0) {
 					printf("%s\n", "Entered3");
@@ -319,10 +317,10 @@ int main(int argc, char const *argv[])
 					printf("%s\n", "Entered4");
 					close_pipe(pfd,pipe_curr,-1);
 				}
-				printf("The path is %s\n", str);/*debug*/
-				printf("The command is %s\n", temp);/*debug*/
+				// printf("The path is %s\n", str);/*debug*/
+				// printf("The command is %s\n", temp);/*debug*/
 
-				printf("The arg are %s\n", par[1]);/*debug*/
+				// printf("The arg are %s\n", par[1]);/*debug*/
 				if (execv(str, par) ==  -1) 
 					printf("error: %s\n", strerror(errno));
 				return 0;
@@ -345,7 +343,7 @@ int main(int argc, char const *argv[])
 
 				if (pflag == 1 && pipe_curr < pipe_count) {
 					pipe_curr++;
-					printf("%s%d\n", "Inc", pipe_curr);
+					//printf("%s%d\n", "Inc", pipe_curr);
 					continue;
 
 				} else if (pflag == 1 &&
@@ -355,7 +353,6 @@ int main(int argc, char const *argv[])
 				}
 				if (pflag == 1 
 					&& pipe_curr == pipe_count+1) {
-
 					pflag = 0;
 					//dup2(0, 0);
 					//dup2(1, 1);
