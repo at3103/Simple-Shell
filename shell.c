@@ -240,20 +240,24 @@ int main(int argc, char const *argv[])
 					hflag = 1;
 					continue;
 				} else {
-					printf("%s", "error :");
+					printf("%s", "Error:");
 					printf("%s\n", "Offset out of range");
 				}
 			} else
-				printf("%s\n", "Error : Invalid argument");
+				printf("%s\n", "Error: Invalid argument");
 			flag = 1;
 		}
 
 		/*cd command*/
 		else if (strcmp(temp, "cd") == 0 && pflag == 0) {
 			flag = 1;
+			if (strcmp(par1,"\0")==0) {// || strcmp(par[2],"\0")!=0) {
+				printf("%s\n", "Error: cd takes a single argument" );
+				exit(EXIT_FAILURE);
+			}
 			chdir(par1);
-			getcwd(cwd, sizeof(cwd));
-			printf("%s\n", cwd);/*debug*/
+			// getcwd(cwd, sizeof(cwd));
+			// printf("%s\n", cwd);/*debug*/
 		}
 
 		/*exit command*/
