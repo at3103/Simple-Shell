@@ -126,7 +126,7 @@ int close_pipe(int *pfd)
 {
 	int l = 0;
 
-	for (l = 0; l <= pipe_count; ++l)
+	for (l = 0; l < 2*pipe_count; ++l)
 		close(pfd[l]);
 }
 
@@ -150,7 +150,6 @@ int main(int argc, char const *argv[])
 	int hflag = 0;
 	int *pfd;
 	int pflag = 0;
-
 	int l;
 
 	flag = 0;
@@ -201,7 +200,7 @@ int main(int argc, char const *argv[])
 			}
 
 			strcpy(str, strpipe[pipe_curr]);
-
+			str_len = strlen(str);
 		}
 		str1 = (char *)malloc(str_len*sizeof(char));
 		par1 = (char *)malloc(str_len*sizeof(char));
@@ -220,6 +219,9 @@ int main(int argc, char const *argv[])
 		split(str, par);
 		strcpy(temp, str1);
 
+		printf("String is -%s-\n", str);
+		printf("Str1 is -%s-\n", str1);
+		printf("temp is -%s-\n", temp);
 
 		if (strcmp(temp, "history") == 0 && pflag == 0) {
 			if (strcmp(par1, "\0") == 0) {
@@ -251,8 +253,8 @@ int main(int argc, char const *argv[])
 		/*cd command*/
 		else if (strcmp(temp, "cd") == 0 && pflag == 0) {
 			flag = 1;
-			if (strcmp(par1,"\0")==0) {// || strcmp(par[2],"\0")!=0) {
-				printf("%s\n", "Error: cd takes a single argument" );
+			if (strcmp(par1, "\0") == 0) {
+				printf("%s\n", "Error: cd takes a single arg");
 				exit(EXIT_FAILURE);
 			}
 			chdir(par1);
@@ -269,7 +271,6 @@ int main(int argc, char const *argv[])
 
 		else {
 			pid = fork();
-
 			if (pid < 0) {
 				perror("fork");
 
@@ -281,19 +282,30 @@ int main(int argc, char const *argv[])
 			else if (pid == 0 && pflag == 1) {
 				if (pipe_curr < pipe_count
 					&& pipe_curr != 0) {
-					dup2(pfd[pipe_curr-1], 0);
-					dup2(pfd[pipe_curr+1], 1);
+					//if (pipe_curr % 2 != 0)
+					dup2(pfd[(2 * 1) - 2], 0);
+					//dup2(pfd[0],0);
+					//close(pfd[0]);
+					//dup2(pfd[3],1);
+					//close(pfd[3]);
+					//close_pipe(pfd);
+					dup2(pfd[(2 * 1) + 1], 1);
+					//printf("%s\n",*stdin);
+					//printf("%s\n",*stdout);
+					//else
 					close_pipe(pfd);
 
 
 				} else if (pipe_curr == 0) {
-					dup2(pfd[pipe_curr+1], 1);
+					printf("%s\n","Reached child");
+					dup2(pfd[1], 1);
 					close_pipe(pfd);
-
 				} else {
-					dup2(pfd[pipe_curr-1], 0);
+					printf("%s\n","second child");
+					dup2(pfd[(2 * pipe_count) - 2], 0);
 					close_pipe(pfd);
 				}
+				printf("%s\n", "Reached here!!");
 				if (execv(str, par) ==  -1)
 					printf("error: %s\n", strerror(errno));
 				return 0;
@@ -324,14 +336,16 @@ int main(int argc, char const *argv[])
 					pipe_count =  -1;
 					free(strpipe[64]);
 					free(pfd);
-
+					//continue;
 				}
-				while (wait(&status) != pid)
+				if (pflag==0)
+				{
+					while (wait(&status) != pid)
 					;
-
+				}
+				
 			}
 		}
-
 	}
 	mem_clear();
 	return 0;
