@@ -9,7 +9,7 @@
 #include <errno.h>
 
 
-char *hist[100];//=NULL;
+char *hist[100];
 int hist_count =  -1;
 int pipe_count =  -1;
 char *strpipe[64];
@@ -90,10 +90,8 @@ int display_history(void)
 {
 	int i;
 
-	if (hist_count ==  -1) {
-//		printf("\n\n");
+	if (hist_count ==  -1)
 		return 0;
-	}
 
 	for (i = 0; i <= hist_count; i++)
 		printf("%d %s\n", i, hist[i]);
@@ -152,6 +150,7 @@ int main(int argc, char const *argv[])
 	int pflag = 0;
 	int l;
 	int pcount;
+	int pc;
 
 	flag = 0;
 
@@ -163,8 +162,6 @@ int main(int argc, char const *argv[])
 		free(hist[100]);
 		free(par1);
 		free(temp);
-		// free(strpipe[64]);
-		// free(pfd);
 	}
 
 	/*For continuos prompts*/
@@ -190,6 +187,7 @@ int main(int argc, char const *argv[])
 					insert_history(str, str_size);
 
 				compute_pipe(str);
+				pcount = 2 * pipe_count;
 				pfd = (int *)malloc((pipe_count)*2*sizeof(int));
 				pipe_curr = 0;
 				for (i = 0; i < pipe_count; ++i) {
@@ -215,15 +213,11 @@ int main(int argc, char const *argv[])
 
 		if (strcmp(str1, "history") != 0 && hflag == 0 && pflag == 0)
 			insert_history(str, str_size);
-		else //if (strcmp(str1,"history")==0){
+		else
 			hflag = 0;
 
 		split(str, par);
 		strcpy(temp, str1);
-
-		// printf("String is -%s-\n", str); //debug
-		// printf("Str1 is -%s-\n", str1);	//debug
-		// printf("temp is -%s-\n", temp);	//debug
 
 		if (strcmp(temp, "history") == 0 && pflag == 0) {
 			if (strcmp(par1, "\0") == 0) {
@@ -244,13 +238,13 @@ int main(int argc, char const *argv[])
 					hflag = 1;
 					continue;
 				} else {
-					//printf("%s", "Error:");
-					//printf("%s\n", "Offset out of range");
-					perror("Offset out of range");
+					fprintf(stderr, "%s", "Error: Offset");
+					fprintf(stderr, "%s\n", "out of range");
 				}
-			} else
-				//printf("Error: Invalid argument");
-				perror("Error: Invalid argument");
+			} else {
+				fprintf(stderr, "Error: ");
+				fprintf(stderr, "%s\n", "Invalid argument");
+			}
 			flag = 1;
 		}
 
@@ -258,13 +252,10 @@ int main(int argc, char const *argv[])
 		else if (strcmp(temp, "cd") == 0 && pflag == 0) {
 			flag = 1;
 			if (strcmp(par1, "\0") == 0) {
-				printf("%s\n", "Error: cd takes a single arg");
-				//perror("Error: cd takes a single arg");
-				//exit(EXIT_FAILURE);
+				fprintf(stderr, "%s", "Error: cd takes ");
+				fprintf(stderr, "%s\n", "a single arg");
 			}
 			chdir(par1);
-			// getcwd(cwd, sizeof(cwd));
-			// printf("%s\n", cwd);/*debug*/
 		}
 
 		/*exit command*/
@@ -287,42 +278,34 @@ int main(int argc, char const *argv[])
 			else if (pid == 0 && pflag == 1) {
 				if (pipe_curr < pipe_count
 					&& pipe_curr != 0) {
-					//if (pipe_curr % 2 != 0)
-					if (dup2(pfd[(2 * pipe_curr) - 2], 0) == -1) {
-						printf("error: %s\n", strerror(errno));
+					if (dup2(pfd[pc - 2], 0) == -1) {
+						printf("error: ");
+						printf("%s\n", strerror(errno));
 						exit(EXIT_FAILURE);
 					}
-					//dup2(pfd[0],0);
-					//close(pfd[0]);
-					//dup2(pfd[3],1);
-					//close(pfd[3]);
-					//close_pipe(pfd);
-					if (dup2(pfd[(2 * pipe_curr) + 1], 1) == -1) {
-						printf("error: %s\n", strerror(errno));
+					if (dup2(pfd[pc + 1], 1) == -1) {
+						printf("error: ");
+						printf("%s\n", strerror(errno));
 						exit(EXIT_FAILURE);
 					}
-					//printf("%s\n",*stdin);
-					//printf("%s\n",*stdout);
-					//else
 					close_pipe(pfd);
 
 
 				} else if (pipe_curr == 0) {
-					//printf("%s\n", "Reached child");
 					if (dup2(pfd[1], 1) == -1) {
-						printf("error: %s\n", strerror(errno));
+						printf("error: ");
+						printf("%s\n", strerror(errno));
 						exit(EXIT_FAILURE);
 					}
 					close_pipe(pfd);
 				} else {
-					//printf("%s\n", "second child");
-					if (dup2(pfd[(2 * pipe_count) - 2], 0) == -1) {
-						printf("error: %s\n", strerror(errno));
+					if (dup2(pfd[(pcount) - 2], 0) == -1) {
+						printf("error: ");
+						printf("%s\n", strerror(errno));
 						exit(EXIT_FAILURE);
 					}
 					close_pipe(pfd);
 				}
-				//printf("%s\n", "Reached here!!");
 				if (execv(str, par) ==  -1)
 					printf("error: %s\n", strerror(errno));
 				return 0;
@@ -341,29 +324,25 @@ int main(int argc, char const *argv[])
 
 				if (pflag == 1 && pipe_curr < pipe_count) {
 					pipe_curr++;
+					pc = 2 * pipe_curr;
 					continue;
 
 				} else if (pflag == 1 &&
 						pipe_curr == pipe_count) {
 					pipe_curr++;
+					pc = 2 * pipe_curr;
 				}
 				if (pflag == 1
 					&& pipe_curr == pipe_count+1) {
 					pflag = 0;
 					pipe_curr = 0;
+					pc = 0;
 					close_pipe(pfd);
-					pcount=pipe_count;
 					pipe_count =  -1;
 					free(strpipe[64]);
 					free(pfd);
-					//continue;
 				}
 				if (pflag == 0)
-					// for (i = 0; i < pcount; ++i)
-					// {
-					// 	while (wait(&status) != pid)
-					// ;
-					// }
 					while (wait(&status) != pid)
 					;
 			}
