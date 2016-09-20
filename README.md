@@ -5,6 +5,8 @@ The written assignment is added as a .txt file and a .pdf file in the hmwk1-at31
 
 The main program is present in shell.c which provides and exectable w4118_sh on make.
 
+My program won't work with trailing or leading spaces. This particular feature hasn't been implemented.
+
 References:
 
 I have referred the followings links and books to better understand the topics.
