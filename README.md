@@ -21,9 +21,12 @@ makefile	   output.txt	      session.in   shell_modified.c  test_command.txt
 OS Homework 1.pdf  README	      session.out  test		     w4118_sh
 
 $ls
+
 error: No such file or directory
 
+
 $cd
+
 Error: cd takes a single arg
 
 $cd ../
@@ -59,54 +62,84 @@ $/bin/ls -l test.c
 -rw-r--r-- 1 w4118 w4118 376 Sep 17 22:46 test.c
 
 $bin/echo A|/bin/echo B|/bin/echo C|/bin/echo A|/bin/echo B|/bin/echo C|/bin/echo A|/bin/echo B|/bin/echo C|/bin/echo A|/bin/echo B|/bin/echo C|/bin/echo A|/bin/echo B|/bin/echo C|/bin/echo A|/bin/echo B|/bin/echo C|/bin/echo A|/bin/echo B|/bin/echo C|/bin/echo A|/bin/echo B|/bin/echo C|/bin/echo A|/bin/echo B|/bin/echo C|/bin/echo A|/bin/echo B|/bin/echo C|/bin/echo A|/bin/echo B|/bin/echo C|/bin/echo A|/bin/echo B|/bin/echo C|/bin/echo A|/bin/echo B|/bin/echo C|/bin/echo A|/bin/echo B|/bin/echo C
+
 C
 
 $/bin/ls|/bin/ls|/bin/ls|/bin/ls|/bin/ls|/usr/bin/wc|/bin/ls|/bin/ls|/bin/ls|/bin/ls|/bin/ls|/usr/bin/wc 
+
      15      19     165
 
+
 $as|as|DFsdassa|sa
+
 error: No such file or directory
 
+
 $as|as|/bin/ls
+
 a.out		   OS Homework 1.txt  README.md    shell.c	     test.c
 makefile	   output.txt	      session.in   shell_modified.c  test_command.txt
 OS Homework 1.pdf  README	      session.out  test		     w4118_sh
 
 $history|/usr/bin/wc
+
       1       6      33
 
+
 $history
+
 0 hsitory
+
 1 /bin/ls
+
 2 ls
+
 3 cd
+
 4 cd ../
+
 5 /bin/pwd
+
 6 cd hmwk1-at3103
+
 7 /bin/pwd
+
 8 /bin/ls -l
+
 9 /bin/ls -l test.c
+
 10 bin/echo A|/bin/echo B|/bin/echo C|/bin/echo A|/bin/echo B|/bin/echo C|/bin/echo A|/bin/echo B|/bin/echo C|/bin/echo A|/bin/echo B|/bin/echo C|/bin/echo A|/bin/echo B|/bin/echo C|/bin/echo A|/bin/echo B|/bin/echo C|/bin/echo A|/bin/echo B|/bin/echo C|/bin/echo A|/bin/echo B|/bin/echo C|/bin/echo A|/bin/echo B|/bin/echo C|/bin/echo A|/bin/echo B|/bin/echo C|/bin/echo A|/bin/echo B|/bin/echo C|/bin/echo A|/bin/echo B|/bin/echo C|/bin/echo A|/bin/echo B|/bin/echo C|/bin/echo A|/bin/echo B|/bin/echo C
+
 11 /bin/ls|/bin/ls|/bin/ls|/bin/ls|/bin/ls|/usr/bin/wc|/bin/ls|/bin/ls|/bin/ls|/bin/ls|/bin/ls|/usr/bin/wc
+
 12 as|as|DFsdassa|sa
+
 13 as|as|/bin/ls
+
 14 history|/bin/grep hello world
+
 15 history|/usr/bin/grep
+
 16 history|/usr/bin/wc
 
 $history 17
+
 Error: Offsetout of range
 
 $history 16
+
       1       6      33
 
 $history -c
+
 $history
 
 $history 1
+
 Error: Offsetout of range
 
 $exit
+
 w4118@w4118:~/hmwk1-at3103$ 
 
        
