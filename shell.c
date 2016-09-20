@@ -151,6 +151,7 @@ int main(int argc, char const *argv[])
 	int *pfd;
 	int pflag = 0;
 	int l;
+	int pcount;
 
 	flag = 0;
 
@@ -176,11 +177,12 @@ int main(int argc, char const *argv[])
 
 		str_len = strlen(str);
 
+		if (strcmp(str, "\n") == 0)
+		continue;
+
 		if (str_len > 0 && str[str_len-1] == '\n')
 			str[str_len-1] = '\0';
 
-		if (str_len == 1)
-			continue;
 
 		if (strchr(str, '|') != NULL || pflag == 1) {
 			if (pflag == 0) {
@@ -219,9 +221,9 @@ int main(int argc, char const *argv[])
 		split(str, par);
 		strcpy(temp, str1);
 
-		printf("String is -%s-\n", str);
-		printf("Str1 is -%s-\n", str1);
-		printf("temp is -%s-\n", temp);
+		// printf("String is -%s-\n", str); //debug
+		// printf("Str1 is -%s-\n", str1);	//debug
+		// printf("temp is -%s-\n", temp);	//debug
 
 		if (strcmp(temp, "history") == 0 && pflag == 0) {
 			if (strcmp(par1, "\0") == 0) {
@@ -242,11 +244,13 @@ int main(int argc, char const *argv[])
 					hflag = 1;
 					continue;
 				} else {
-					printf("%s", "Error:");
-					printf("%s\n", "Offset out of range");
+					//printf("%s", "Error:");
+					//printf("%s\n", "Offset out of range");
+					perror("Offset out of range");
 				}
 			} else
-				printf("%s\n", "Error: Invalid argument");
+				//printf("Error: Invalid argument");
+				perror("Error: Invalid argument");
 			flag = 1;
 		}
 
@@ -255,7 +259,8 @@ int main(int argc, char const *argv[])
 			flag = 1;
 			if (strcmp(par1, "\0") == 0) {
 				printf("%s\n", "Error: cd takes a single arg");
-				exit(EXIT_FAILURE);
+				//perror("Error: cd takes a single arg");
+				//exit(EXIT_FAILURE);
 			}
 			chdir(par1);
 			// getcwd(cwd, sizeof(cwd));
@@ -283,13 +288,19 @@ int main(int argc, char const *argv[])
 				if (pipe_curr < pipe_count
 					&& pipe_curr != 0) {
 					//if (pipe_curr % 2 != 0)
-					dup2(pfd[(2 * pipe_curr) - 2], 0);
+					if (dup2(pfd[(2 * pipe_curr) - 2], 0) == -1) {
+						printf("error: %s\n", strerror(errno));
+						exit(EXIT_FAILURE);
+					}
 					//dup2(pfd[0],0);
 					//close(pfd[0]);
 					//dup2(pfd[3],1);
 					//close(pfd[3]);
 					//close_pipe(pfd);
-					dup2(pfd[(2 * pipe_curr) + 1], 1);
+					if (dup2(pfd[(2 * pipe_curr) + 1], 1) == -1) {
+						printf("error: %s\n", strerror(errno));
+						exit(EXIT_FAILURE);
+					}
 					//printf("%s\n",*stdin);
 					//printf("%s\n",*stdout);
 					//else
@@ -297,23 +308,31 @@ int main(int argc, char const *argv[])
 
 
 				} else if (pipe_curr == 0) {
-					printf("%s\n","Reached child");
-					dup2(pfd[1], 1);
+					//printf("%s\n", "Reached child");
+					if (dup2(pfd[1], 1) == -1) {
+						printf("error: %s\n", strerror(errno));
+						exit(EXIT_FAILURE);
+					}
 					close_pipe(pfd);
 				} else {
-					printf("%s\n","second child");
-					dup2(pfd[(2 * pipe_count) - 2], 0);
+					//printf("%s\n", "second child");
+					if (dup2(pfd[(2 * pipe_count) - 2], 0) == -1) {
+						printf("error: %s\n", strerror(errno));
+						exit(EXIT_FAILURE);
+					}
 					close_pipe(pfd);
 				}
-				printf("%s\n", "Reached here!!");
+				//printf("%s\n", "Reached here!!");
 				if (execv(str, par) ==  -1)
 					printf("error: %s\n", strerror(errno));
 				return 0;
 				}
 
 			else if (pid == 0 && pflag == 0) {
-				if (execv(str, par) ==  -1)
+				if (execv(str, par) ==  -1) {
 					printf("error: %s\n", strerror(errno));
+					exit(EXIT_FAILURE);
+				}
 				return 0;
 			}
 
@@ -333,17 +352,20 @@ int main(int argc, char const *argv[])
 					pflag = 0;
 					pipe_curr = 0;
 					close_pipe(pfd);
+					pcount=pipe_count;
 					pipe_count =  -1;
 					free(strpipe[64]);
 					free(pfd);
 					//continue;
 				}
-				if (pflag==0)
-				{
+				if (pflag == 0)
+					// for (i = 0; i < pcount; ++i)
+					// {
+					// 	while (wait(&status) != pid)
+					// ;
+					// }
 					while (wait(&status) != pid)
 					;
-				}
-				
 			}
 		}
 	}
