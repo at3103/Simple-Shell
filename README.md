@@ -5,6 +5,15 @@ The written assignment is added as a .txt file and a .pdf file in the hmwk1-at31
 
 The main program is present in shell.c which provides and exectable w4118_sh on make.
 
+References:
+
+I have referred the followings links and books to better understand the topics.
+
+1. For understanding the structure of makefiles - http://www.cs.colby.edu/maxwell/courses/tutorials/maketutor/
+2. Reference provided in the class website - http://www.cs.cf.ac.uk/Dave/C/CE.html
+3. For pipe() - http://www.cs.cf.ac.uk/Dave/C/CE.html
+
+
 A sample test run of shell.c is provided below: {The output has been formatted/indented for better readability}
 
 w4118@w4118:~/hmwk1-at3103$ ./w4118_sh 
